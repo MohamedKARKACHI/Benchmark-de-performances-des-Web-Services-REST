@@ -2,7 +2,7 @@ spring:
   application:
     name: variant-c-mvc
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/benchmark_db}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/benchmark}
     username: ${SPRING_DATASOURCE_USERNAME:benchmark}
     password: ${SPRING_DATASOURCE_PASSWORD:benchmark123}
     hikari:
@@ -28,13 +28,15 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
   
 management:
   endpoints:
     web:
       exposure:
         include: prometheus,health
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true

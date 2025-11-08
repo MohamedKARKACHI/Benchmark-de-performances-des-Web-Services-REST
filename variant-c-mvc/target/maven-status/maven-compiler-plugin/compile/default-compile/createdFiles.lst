@@ -1,0 +1,8 @@
+com/benchmark/repository/CategoryRepository.class
+com/benchmark/controller/CategoryController.class
+com/benchmark/controller/ItemController.class
+com/benchmark/RestControllerApp.class
+com/benchmark/repository/ItemRepository.class
+com/benchmark/controller/RelationController.class
+com/benchmark/model/Category.class
+com/benchmark/model/Item.class

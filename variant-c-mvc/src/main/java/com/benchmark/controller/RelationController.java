@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/categories/{id}/items")
+@RequestMapping("/api/v1/categories/{id}/items")
 public class RelationController {
     
     @Autowired

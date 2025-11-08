@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/v1/categories")
 public class CategoryController {
     
     @Autowired

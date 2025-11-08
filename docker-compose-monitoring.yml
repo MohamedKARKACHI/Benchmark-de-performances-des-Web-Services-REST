@@ -11,9 +11,6 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-    depends_on:
-      - variant-c-mvc
-      - variant-d-rest
 
   grafana:
     image: grafana/grafana:latest
@@ -25,6 +22,8 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
     depends_on:
       - prometheus
 

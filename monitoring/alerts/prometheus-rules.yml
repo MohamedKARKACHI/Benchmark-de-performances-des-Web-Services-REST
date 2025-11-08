@@ -1,0 +1,23 @@
+groups:
+  - name: benchmark.rules
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (sum by (instance) (rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+           / sum by (instance) (rate(http_server_requests_seconds_count[5m]))) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate on {{ $labels.instance }}"
+          description: "The 5xx error rate is above 5% for more than 5 minutes. Value: {{ $value }}"
+
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum by (le, instance) (rate(http_server_requests_seconds_bucket[5m]))) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency on {{ $labels.instance }}"
+          description: "p95 latency is above 1s for more than 5 minutes. Value: {{ $value }}"

@@ -1,0 +1,5 @@
+com/benchmark/repository/CategoryRepository.class
+com/benchmark/DataRestApp.class
+com/benchmark/repository/ItemRepository.class
+com/benchmark/model/Category.class
+com/benchmark/model/Item.class

@@ -1,0 +1,129 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "benchmark-test-dashboard",
+    "title": "Benchmark REST - Quick Test",
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 0,
+    "refresh": "10s",
+    "templating": {
+      "list": [
+        {
+          "type": "query",
+          "name": "instance",
+          "label": "Instance",
+          "query": "label_values(http_server_requests_seconds_count, instance)",
+          "includeAll": true,
+          "multi": true,
+          "current": {"text": "All", "value": "$__all"}
+        },
+        {
+          "type": "query",
+          "name": "uri",
+          "label": "URI",
+          "query": "label_values(http_server_requests_seconds_count, uri)",
+          "includeAll": true,
+          "multi": true,
+          "current": {"text": "All", "value": "$__all"}
+        }
+      ]
+    },
+    "panels": [
+      {
+        "type": "timeseries",
+        "title": "Requests per second",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 6},
+        "fieldConfig": {"defaults": {"unit": "req/s"}},
+        "targets": [
+          {"expr": "sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[1m]))", "refId": "A", "format": "time_series"}
+        ]
+      },
+      {
+        "type": "timeseries",
+        "title": "Average latency (ms)",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 6},
+        "fieldConfig": {"defaults": {"unit": "ms"}},
+        "targets": [
+          {"expr": "(sum(rate(http_server_requests_seconds_sum{instance=~\"$instance\", uri=~\"$uri\"}[5m])) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))) * 1000", "refId": "A", "format": "time_series"}
+        ]
+      },
+      {
+        "type": "timeseries",
+        "title": "Error rate (5xx, %)",
+        "gridPos": {"x": 0, "y": 6, "w": 12, "h": 6},
+        "fieldConfig": {"defaults": {"unit": "percent"}},
+        "targets": [
+          {"expr": "(sum(rate(http_server_requests_seconds_count{status=~\"5..\", instance=~\"$instance\", uri=~\"$uri\"}[5m])) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))) * 100", "refId": "A", "format": "time_series"}
+        ]
+      },
+      {
+        "type": "timeseries",
+        "title": "JVM Heap Used",
+        "gridPos": {"x": 12, "y": 6, "w": 12, "h": 6},
+        "fieldConfig": {"defaults": {"unit": "bytes"}},
+        "targets": [
+          {"expr": "jvm_memory_used_bytes{area=\"heap\", instance=~\"$instance\", uri=~\"$uri\"}", "refId": "A", "format": "time_series"}
+        ]
+      },
+      {
+        "type": "timeseries",
+        "title": "Process CPU (%)",
+        "gridPos": {"x": 0, "y": 12, "w": 24, "h": 6},
+        "fieldConfig": {"defaults": {"unit": "percent"}},
+        "targets": [
+          {"expr": "rate(process_cpu_seconds_total{instance=~\"$instance\"}[1m]) * 100", "refId": "A", "format": "time_series"}
+        ]
+      },
+      {
+        "type": "timeseries",
+        "title": "Latency percentiles (p95 / p99 ms)",
+        "gridPos": {"x": 0, "y": 18, "w": 12, "h": 6},
+        "fieldConfig": {"defaults": {"unit": "ms"}},
+        "targets": [
+          {"expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{instance=~\"$instance\", uri=~\"$uri\"}[5m])) by (le)) * 1000", "refId": "A", "format": "time_series", "legendFormat": "p95"},
+          {"expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{instance=~\"$instance\", uri=~\"$uri\"}[5m])) by (le)) * 1000", "refId": "B", "format": "time_series", "legendFormat": "p99"}
+        ]
+      },
+      {
+        "type": "table",
+        "title": "Top endpoints by RPS (5m)",
+        "gridPos": {"x": 12, "y": 18, "w": 12, "h": 6},
+        "targets": [
+          {"expr": "topk(10, sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri!~\"\"}[5m])) by (uri))", "refId": "A", "format": "table"}
+        ]
+      }
+      ,
+      {
+        "type": "stat",
+        "title": "Current 5xx error rate (5m)",
+        "gridPos": {"x": 0, "y": 24, "w": 6, "h": 4},
+        "fieldConfig": {"defaults": {"unit": "percent", "decimals": 2}, "overrides": []},
+        "options": {"orientation": "auto", "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": "*", "include": []}},
+        "targets": [
+          {"expr": "(sum(rate(http_server_requests_seconds_count{status=~\"5..\", instance=~\"$instance\", uri=~\"$uri\"}[5m])) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))) * 100", "refId": "A", "format": "time_series"}
+        ]
+      },
+      {
+        "type": "table",
+        "title": "Errors by status (5m)",
+        "gridPos": {"x": 6, "y": 24, "w": 12, "h": 4},
+        "targets": [
+          {"expr": "sum by (status) (rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))", "refId": "A", "format": "table"}
+        ],
+        "options": {"showHeader": true}
+      },
+      {
+        "type": "bargauge",
+        "title": "5xx count (top endpoints)",
+        "gridPos": {"x": 18, "y": 24, "w": 6, "h": 4},
+        "fieldConfig": {"defaults": {"unit": "none"}},
+        "targets": [
+          {"expr": "topk(5, sum by (uri) (rate(http_server_requests_seconds_count{status=~\"5..\", instance=~\"$instance\", uri!~\"\"}[5m])))", "refId": "A", "format": "table"}
+        ]
+      }
+    ],
+    "time": { "from": "now-1h", "to": "now" }
+  },
+  "overwrite": true
+}

@@ -2,13 +2,16 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+rule_files:
+  - 'alerts/prometheus-rules.yml'
+
 scrape_configs:
   - job_name: 'variant-c-mvc'
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['variant-c-mvc:8080']
     metrics_path: '/actuator/prometheus'
 
   - job_name: 'variant-d-rest'
     static_configs:
-      - targets: ['localhost:8081']
+      - targets: ['variant-d-rest:8081']
     metrics_path: '/actuator/prometheus'

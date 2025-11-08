@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class DataSeeder {
     public static void main(String[] args) throws SQLException {
-        String url = "jdbc:postgresql://localhost:5432/benchmark_db";
+        String url = "jdbc:postgresql://localhost:5432/benchmark";
         String user = "benchmark";
         String password = "benchmark123";
         
