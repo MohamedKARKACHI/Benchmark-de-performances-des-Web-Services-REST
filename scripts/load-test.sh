@@ -10,7 +10,7 @@ if [ -z "$VARIANT" ] || [ -z "$PORT" ] || [ -z "$SCENARIO" ]; then
 fi
 
 echo "Running $SCENARIO on $VARIANT (port $PORT)..."
-jmeter -n -t "jmeter/scenarios/$SCENARIO-*.jmx" \
+./jmeter/bin/jmeter -n -t "jmeter/scenarios/1-read-heavy-updated.jmx" \
   -Jhost=localhost \
   -Jport=$PORT \
   -l "results/$VARIANT-$SCENARIO.jtl" \

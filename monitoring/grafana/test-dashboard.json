@@ -42,10 +42,32 @@
       {
         "type": "timeseries",
         "title": "Average latency (ms)",
+        "description": "Average response time. Thresholds: green <100ms, yellow 100-500ms, red >500ms",
         "gridPos": {"x": 12, "y": 0, "w": 12, "h": 6},
-        "fieldConfig": {"defaults": {"unit": "ms"}},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "custom": {
+              "fillOpacity": 10,
+              "lineWidth": 2,
+              "spanNulls": true
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 100, "color": "yellow"},
+                {"value": 500, "color": "red"}
+              ]
+            }
+          }
+        },
+        "options": {
+          "tooltip": {"mode": "single", "sort": "none"},
+          "legend": {"displayMode": "list", "placement": "right", "showLegend": true}
+        },
         "targets": [
-          {"expr": "(sum(rate(http_server_requests_seconds_sum{instance=~\"$instance\", uri=~\"$uri\"}[5m])) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))) * 1000", "refId": "A", "format": "time_series"}
+          {"expr": "(sum(rate(http_server_requests_seconds_sum{instance=~\"$instance\", uri=~\"$uri\"}[5m])) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))) * 1000", "refId": "A", "format": "time_series", "legendFormat": "avg"}
         ]
       },
       {
@@ -78,8 +100,30 @@
       {
         "type": "timeseries",
         "title": "Latency percentiles (p95 / p99 ms)",
+        "description": "p95 and p99 response times. Thresholds: green <200ms, yellow 200-1000ms, red >1000ms",
         "gridPos": {"x": 0, "y": 18, "w": 12, "h": 6},
-        "fieldConfig": {"defaults": {"unit": "ms"}},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "custom": {
+              "fillOpacity": 10,
+              "lineWidth": 2,
+              "spanNulls": true
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 200, "color": "yellow"},
+                {"value": 1000, "color": "red"}
+              ]
+            }
+          }
+        },
+        "options": {
+          "tooltip": {"mode": "multi", "sort": "none"},
+          "legend": {"displayMode": "list", "placement": "right", "showLegend": true}
+        },
         "targets": [
           {"expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{instance=~\"$instance\", uri=~\"$uri\"}[5m])) by (le)) * 1000", "refId": "A", "format": "time_series", "legendFormat": "p95"},
           {"expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{instance=~\"$instance\", uri=~\"$uri\"}[5m])) by (le)) * 1000", "refId": "B", "format": "time_series", "legendFormat": "p99"}
@@ -97,9 +141,31 @@
       {
         "type": "stat",
         "title": "Current 5xx error rate (5m)",
+        "description": "5xx error rate over the last 5 minutes. Thresholds: green <1%, yellow 1-5%, red >5%",
         "gridPos": {"x": 0, "y": 24, "w": 6, "h": 4},
-        "fieldConfig": {"defaults": {"unit": "percent", "decimals": 2}, "overrides": []},
-        "options": {"orientation": "auto", "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": "*", "include": []}},
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 1, "color": "yellow"},
+                {"value": 5, "color": "red"}
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "orientation": "auto",
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "reduceOptions": {"values": false, "calcs": ["lastNotNull"], "fields": "*", "include": []},
+          "textMode": "auto"
+        },
         "targets": [
           {"expr": "(sum(rate(http_server_requests_seconds_count{status=~\"5..\", instance=~\"$instance\", uri=~\"$uri\"}[5m])) / sum(rate(http_server_requests_seconds_count{instance=~\"$instance\", uri=~\"$uri\"}[5m]))) * 100", "refId": "A", "format": "time_series"}
         ]
